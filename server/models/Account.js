@@ -33,6 +33,11 @@ const AccountSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    trim: true,
+    default: '',
+  },
   createdDate: {
     type: Date,
     default: Date.now,

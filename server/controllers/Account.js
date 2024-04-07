@@ -3,6 +3,18 @@ const models = require('../models');
 const { Account } = models;
 
 const loginPage = (req, res) => res.render('login');
+const accountPage = (req, res) => res.render('account');
+
+const getAccount = async (req, res) => {
+  try {
+    const docs = await Account.findById(req.session.account._id).select('username email').lean().exec();
+
+    return res.json({ user: docs });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Error retrieving account info!' });
+  }
+};
 
 const logout = (req, res) => {
   // Destory removes a user's session so we know they are no longer logged in
@@ -31,11 +43,12 @@ const login = (req, res) => {
 
 const signup = async (req, res) => {
   const username = `${req.body.username}`;
+  const email = `${req.body.email}`;
   const pass = `${req.body.pass}`;
   const pass2 = `${req.body.pass2}`;
 
   if (!username || !pass || !pass2) {
-    return res.status(400).json({ error: 'All fields are required!' });
+    return res.status(400).json({ error: 'Missing required fields!' });
   }
 
   if (pass !== pass2) {
@@ -44,7 +57,12 @@ const signup = async (req, res) => {
 
   try {
     const hash = await Account.generateHash(pass);
-    const newAccount = new Account({ username, password: hash });
+    let newAccount;
+    if (email !== undefined) {
+      newAccount = new Account({ username, password: hash, email });
+    } else {
+      newAccount = new Account({ username, password: hash });
+    }
     await newAccount.save();
     req.session.account = Account.toAPI(newAccount);
     return res.json({ redirect: '/maker' });
@@ -58,7 +76,9 @@ const signup = async (req, res) => {
 };
 
 module.exports = {
+  getAccount,
   loginPage,
+  accountPage,
   login,
   logout,
   signup,

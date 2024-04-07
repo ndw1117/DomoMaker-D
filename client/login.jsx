@@ -23,11 +23,12 @@ const handleSignup = (e) => {
     helper.hideError();
 
     const username = e.target.querySelector('#user').value;
+    const email = e.target.querySelector('#email').value;
     const pass = e.target.querySelector('#pass').value;
     const pass2 = e.target.querySelector('#pass2').value;
 
     if (!username || !pass || !pass2) {
-        helper.handleError('All fields are required!');
+        helper.handleError('Missing required fields!');
         return false;
     }
 
@@ -36,7 +37,8 @@ const handleSignup = (e) => {
         return false;
     }
 
-    helper.sendPost(e.target.action, {username, pass, pass2});
+    // If no email was entered, it will later be gracefully received as an empty string
+    helper.sendPost(e.target.action, {username, email, pass, pass2});
 
     return false;
 }
@@ -70,11 +72,13 @@ const SignupWindow = (props) => {
             method="POST"
             className="mainForm"
         >
-            <label htmlFor="username">Username: </label>
+            <label htmlFor="username"><span class="required">*</span>Username: </label>
             <input id="user" type="text" name="username" placeholder="username" />
-            <label htmmlFor="pass">Password: </label>
+            <label htmlFor="email">Email: </label>
+            <input id="email" type="email" name="email" placeholder="email" />
+            <label htmmlFor="pass"><span class="required">*</span>Password: </label>
             <input id="pass" type="password" name="pass" placeholder="password" />
-            <label htmlFor="pass">Password: </label>
+            <label htmlFor="pass"><span class="required">*</span>Password: </label>
             <input id="pass2" type="password" name="pass2" placeholder="retype password" />
             <input className="formSubmit" type="submit" value="Sign up" />
         </form>
